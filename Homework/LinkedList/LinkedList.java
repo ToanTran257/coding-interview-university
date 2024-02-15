@@ -14,33 +14,32 @@ class Node {
 public class LinkedList {
 
   Node head;
+  int size;
 
   public LinkedList() {
+    size = 0;
     head = null;
   }
 
   public LinkedList(int value) {
     Node node = new Node(value);
+    size = 1;
     head = node;
   }
 
   public int size() {
-    Node traverse = head;
-    int count = 0;
-
-    while (traverse != null) {
-      count++;
-      traverse = traverse.next;
-    }
-
-    return count;
+    return this.size;
   }
 
   public boolean isEmpty() {
-    return this.size() == 0;
+    return size == 0;
   }
 
   public int valueAt(int index) throws Exception {
+    if (size == 0) {
+      throw new Exception("Index out of bound");
+    }
+
     Node traverse = head;
 
     while (traverse != null && index > 0) {
@@ -48,7 +47,7 @@ public class LinkedList {
       traverse = traverse.next;
     }
 
-    if (index < 0 || traverse == null) {
+    if (index != 0 || traverse == null) {
       throw new Exception("Index out of bound");
     }
     return traverse.value;
@@ -56,42 +55,62 @@ public class LinkedList {
 
   public void pushFront(int value) {
     Node node = new Node(value);
+    if (size == 0) {
+      size++;
+      head = node;
+      return;
+    }
 
     node.next = head;
     head = node;
+    size++;
   }
 
-  public int popFront() {
-    Node result = head;
-    if (result == null) {
-      // TODO: throw exception
-      return 0;
+  public int popFront() throws Exception {
+    if (size == 0) {
+      throw new Exception("Linked List is empty");
     }
 
+    int result = head.value;
     head = head.next;
-    return result.value;
+    size--;
+    return result;
   }
 
   public void pushBack(int value) {
     Node node = new Node(value);
-
-    while (head.next != null) {
-      head = head.next;
+    if (size == 0) {
+      head = node;
+      size++;
+      return;
     }
 
-    head.next = node;
+    Node traverse = head;
+
+    while (traverse.next != null) {
+      traverse = traverse.next;
+    }
+    size++;
+    traverse.next = node;
   }
 
-  public int popBack() {
-    Node prev = new Node(0);
-    prev.next = head;
-    while (head.next != null) {
-      prev = prev.next;
-      head = head.next;
+  public int popBack() throws Exception {
+    if (size == 0) {
+      throw new Exception("Linked List is empty");
     }
 
-    int result = head.value;
+    Node prev = new Node(0);
+    Node traverse = head;
+
+    prev.next = traverse;
+    while (traverse.next != null) {
+      prev = prev.next;
+      traverse = traverse.next;
+    }
+
+    int result = traverse.value;
     prev.next = null;
+    size--;
     return result;
   }
 
@@ -100,56 +119,88 @@ public class LinkedList {
   }
 
   public int back() {
-    while (head.next != null) {
-      head = head.next;
+    Node traverse = head;
+
+    while (traverse.next != null) {
+      traverse = traverse.next;
     }
 
-    return head.value;
+    return traverse.value;
   }
 
-  public void insert(int index, int value) {
-    Node node = new Node(value);
-    Node prev = new Node(0);
-    prev.next = head;
-
-    while (head != null && index-- > 0) {
-      prev = prev.next;
-      head = head.next;
+  public void insert(int index, int value) throws Exception {
+    if (index < 0 || index > size) {
+      throw new Exception("Index out of bound");
     }
 
-    node.next = head;
+    if (index == 0) {
+      this.pushFront(value);
+      return;
+    }
+
+    if (index == size) {
+      this.pushBack(value);
+      return;
+    }
+
+    Node node = new Node(value);
+    Node prev = new Node(0);
+    Node traverse = head;
+    prev.next = traverse;
+
+    while (traverse != null && index-- > 0) {
+      prev = prev.next;
+      traverse = traverse.next;
+    }
+
+    node.next = traverse;
     prev.next = node;
+    size++;
   }
 
   public void erase(int index) throws Exception {
-    Node prev = new Node(0);
-    prev.next = head;
-
-    while (head != null && index-- > 0) {
-      prev = prev.next;
-      head = head.next;
-    }
-
-    if (index > 0) {
+    if (index < 0 || index >= size) {
       throw new Exception("Index out of bound");
     }
 
-    prev.next = head == null ? null : head.next;
+    if (index == 0) {
+      this.popFront();
+      return;
+    }
+
+    if (index == size - 1) {
+      this.popBack();
+      return;
+    }
+    Node prev = new Node(0);
+    Node traverse = head;
+
+    prev.next = traverse;
+
+    while (traverse != null && index-- > 0) {
+      prev = prev.next;
+      traverse = traverse.next;
+    }
+
+    prev.next = traverse == null ? null : traverse.next;
+    size--;
   }
 
   public int valueNFromEnd(int n) throws Exception {
-    Node prev = head;
-
-    while (head != null && n-- > 0) {
-      head = head.next;
-    }
-
-    if (n > 0) {
+    if (n <= 0 || n > size) {
       throw new Exception("Index out of bound");
     }
 
-    while (head != null) {
-      head = head.next;
+    Node traverse = head;
+
+    Node prev = traverse;
+
+    while (traverse != null && n-- > 0) {
+      traverse = traverse.next;
+    }
+
+    while (traverse != null) {
+      traverse = traverse.next;
       prev = prev.next;
     }
 
@@ -157,28 +208,49 @@ public class LinkedList {
   }
 
   public void reverse() {
-    Node prev = head;
+    Node prev = null;
 
     while (head != null) {
-      Node temp = prev;
+      Node next = head.next;
 
-      prev = head.next;
-      prev.next = head;
-      head = head.next;
-
-      prev = temp;
+      head.next = prev;
+      prev = head;
+      head = next;
     }
+    head = prev;
   }
 
   public void removeValue(int value) {
     Node prev = new Node(0);
-    prev.next = head;
+    Node traverse = head;
 
-    while (head != null && head.value != value) {
-      head = head.next;
+    prev.next = traverse;
+
+    while (traverse != null && traverse.value != value) {
+      traverse = traverse.next;
       prev = prev.next;
     }
 
+    if (traverse == null) {
+      return;
+    }
+
     prev.next = prev.next.next;
+    size--;
+  }
+
+  public String toString() {
+    Node traverse = head;
+    StringBuilder sb = new StringBuilder();
+
+    while (traverse != null) {
+      sb.append(traverse.value);
+      traverse = traverse.next;
+      if (traverse != null) {
+        sb.append(",");
+      }
+    }
+
+    return sb.toString();
   }
 }
