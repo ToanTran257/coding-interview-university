@@ -17,7 +17,7 @@ public class ArrayStack<E> {
   }
 
   public boolean isEmpty() {
-   return t == -1;
+    return t == -1;
   }
 
   public void push(E e) throws IllegalStateException {
