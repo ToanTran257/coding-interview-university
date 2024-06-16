@@ -1,9 +1,8 @@
 package Homework.Graph;
 
-import java.io.*;
 import java.util.*;
 
-class DFSAdjacencyListIterativeWithStack {
+class DFSListIterativeWithStack {
 
   static class Graph {
 

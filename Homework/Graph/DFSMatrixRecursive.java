@@ -2,7 +2,7 @@ package Homework.Graph;
 
 import java.io.*;
 
-class DFSAdjacencyListRecursive {
+class DFSMatrixRecursive {
 
   static int[][] matrix;
 
